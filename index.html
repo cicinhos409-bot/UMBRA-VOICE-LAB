@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Umbra Voice Lab</title>
+<meta name="description" content="Estúdio de voz para Windows: narrações de uma hora, voz clonada, transcrição com legendas e tratamento de áudio, tudo processado no seu computador.">
+<meta property="og:title" content="Umbra Voice Lab">
+<meta property="og:description" content="Narrações longas, voz clonada e legendas geradas no seu PC. Seus roteiros não saem do computador.">
+<meta property="og:image" content="assets/tela-texto-para-voz.jpg">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0b0a08">
+<link rel="icon" type="image/png" href="assets/favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="assets/icone.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single dark "studio console" column; screenshots sit in window frames, numbers set in mono like a mixing desk readout. */
+:root {
+  color-scheme: dark;
+  --bg: #0b0a08;
+  --surface: #15130f;
+  --surface-2: #1d1a15;
+  --line: #2c2820;
+  --fg: #f3efe6;
+  --muted: #b3ab9c;
+  --dim: #7d7668;
+  --amber: #f59e0b;
+  --amber-soft: #fbbf24;
+  --amber-ink: #1a1203;
+  --ok: #34d399;
+  --font-display: "Syne", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --radius: 14px;
+  --max: 1160px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 400 17px/1.6 var(--font-body); -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; display: block; }
+a { color: var(--amber-soft); }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--amber-soft); outline-offset: 3px; border-radius: 6px; }
+.wrap { width: 100%; max-width: var(--max); margin-inline: auto; padding-inline: 20px; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.05; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: clamp(30px, 4.2vw, 48px); }
+h3 { font-size: 22px; line-height: 1.2; }
+p { margin: 0; }
+.eyebrow { font: 500 13px/1 var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber); }
+.lede { color: var(--muted); font-size: 19px; max-width: 62ch; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+section { padding-block: clamp(64px, 9vw, 112px); }
+
+/* nav */
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 24px; padding-block: 14px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--fg); }
+.brand img { width: 34px; height: 34px; }
+.brand strong { font: 700 18px/1 var(--font-display); letter-spacing: 0.08em; }
+.brand small { display: block; font: 500 10px/1 var(--font-mono); letter-spacing: 0.24em; color: var(--muted); margin-top: 3px; }
+.nav-links { display: flex; gap: 22px; margin-left: auto; }
+.nav-links a { color: var(--muted); text-decoration: none; font-size: 15px; }
+.nav-links a:hover { color: var(--fg); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 22px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); color: var(--fg); font: 600 16px/1 var(--font-body); text-decoration: none; cursor: pointer; transition: transform .15s ease, background .15s ease; }
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--amber); border-color: var(--amber); color: var(--amber-ink); }
+.btn-primary:hover { background: var(--amber-soft); }
+.nav .btn { min-height: 40px; padding: 0 16px; font-size: 15px; }
+
+/* hero */
+.hero { padding-block: clamp(48px, 7vw, 88px) clamp(40px, 6vw, 72px); position: relative; overflow: hidden; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; }
+.hero h1 { font-size: clamp(36px, 9vw, 64px); font-weight: 800; }
+.hero h1 em { font-style: normal; color: var(--amber); }
+.hero .lede { margin-top: 22px; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.hero-note { margin-top: 14px; color: var(--dim); font-size: 14px; }
+.timecode { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 36px; padding: 14px 18px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); max-width: 640px; }
+.timecode b { font: 500 28px/1 var(--font-mono); color: var(--amber-soft); font-variant-numeric: tabular-nums; }
+.timecode span { color: var(--muted); font-size: 14px; flex: 1 1 220px; min-width: 0; }
+.wave { display: flex; align-items: center; gap: 3px; height: 72px; margin-top: 28px; max-width: 640px; }
+.wave i { flex: 1 1 0; min-width: 2px; border-radius: 2px; background: linear-gradient(var(--amber-soft), var(--amber)); opacity: .9; transform-origin: center; animation: pulse 2.6s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { transform: scaleY(.55); } 50% { transform: scaleY(1); } }
+.shot { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); box-shadow: 0 30px 80px -30px rgba(0, 0, 0, .8), 0 0 0 1px rgba(245, 158, 11, .05); }
+.shot-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); font: 500 12px/1 var(--font-mono); color: var(--dim); }
+.shot-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.shot-bar span { margin-left: 8px; }
+.shot img { width: 100%; height: auto; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 1px solid var(--line); }
+.stat { padding: 26px 22px; display: grid; gap: 6px; align-content: start; }
+.stat + .stat { border-left: 1px solid var(--line); }
+.stat b { font: 500 34px/1 var(--font-mono); color: var(--fg); font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: 14px; }
+
+/* audience */
+.audience { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 40px; }
+.audience div { padding: 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); display: grid; gap: 8px; align-content: start; }
+.audience b { font-family: var(--font-display); font-size: 18px; }
+.audience span { color: var(--muted); font-size: 15px; }
+
+/* features */
+.feature { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
+.feature + .feature { margin-top: clamp(64px, 9vw, 110px); }
+.feature.flip > :first-child { order: 2; }
+.feature-copy { display: grid; gap: 16px; min-width: 0; }
+.feature-copy p { color: var(--muted); }
+.ticks { list-style: none; padding: 0; margin: 4px 0 0; display: grid; gap: 10px; }
+.ticks li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; color: var(--fg); font-size: 16px; }
+.ticks li::before { content: ""; width: 12px; height: 12px; margin-top: 7px; border-radius: 3px; background: var(--amber); }
+.tag { display: inline-block; font: 500 12px/1 var(--font-mono); padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); }
+
+/* steps */
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 40px; counter-reset: step; }
+.step { padding: 24px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); display: grid; gap: 10px; align-content: start; }
+.step::before { counter-increment: step; content: "0" counter(step); font: 500 14px/1 var(--font-mono); color: var(--amber); }
+.step p { color: var(--muted); font-size: 15px; }
+
+/* speed table */
+.table-wrap { overflow-x: auto; margin-top: 36px; border: 1px solid var(--line); border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; min-width: 620px; }
+th, td { text-align: left; padding: 16px 18px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 500 12px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); background: var(--surface); }
+tr:last-child td { border-bottom: 0; }
+td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--amber-soft); white-space: nowrap; }
+td small { display: block; color: var(--dim); font-size: 13px; margin-top: 4px; }
+.footnote { margin-top: 14px; color: var(--dim); font-size: 14px; max-width: 80ch; }
+
+/* gallery */
+.gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 40px; }
+.gallery figure { margin: 0; display: grid; gap: 10px; }
+.gallery figcaption { color: var(--muted); font-size: 14px; }
+
+/* requirements + licenses */
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 40px; }
+.panel { padding: 26px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); display: grid; gap: 14px; align-content: start; }
+.panel dl { display: grid; grid-template-columns: max-content 1fr; gap: 10px 18px; margin: 0; }
+.panel dt { color: var(--dim); font-size: 14px; }
+.panel dd { margin: 0; font-size: 15px; }
+.panel p { color: var(--muted); font-size: 15px; }
+.panel.license { border-color: color-mix(in srgb, var(--amber) 35%, var(--line)); }
+
+/* pricing */
+.price { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 0; margin-top: 40px; border: 1px solid color-mix(in srgb, var(--amber) 40%, var(--line)); border-radius: 18px; overflow: hidden; background: radial-gradient(circle at 85% 0%, rgba(245, 158, 11, .14), transparent 55%), var(--surface); }
+.price-list { padding: 32px; display: grid; gap: 12px; align-content: start; }
+.price-box { padding: 32px; border-left: 1px solid var(--line); display: grid; gap: 14px; align-content: center; }
+.price-box .value { font: 500 48px/1 var(--font-mono); color: var(--fg); font-variant-numeric: tabular-nums; }
+.price-box .value small { font-size: 16px; color: var(--muted); }
+.price-box p { color: var(--muted); font-size: 14px; }
+.price-box .btn { width: 100%; min-height: 56px; font-size: 18px; }
+
+/* faq */
+.faq { margin-top: 32px; display: grid; gap: 10px; max-width: 860px; }
+.faq details { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 0 20px; }
+.faq summary { cursor: pointer; list-style: none; padding: 18px 0; font-weight: 600; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-family: var(--font-mono); color: var(--amber); }
+.faq details[open] summary::after { content: "−"; }
+.faq details p { color: var(--muted); padding-bottom: 18px; font-size: 16px; }
+
+footer { border-top: 1px solid var(--line); padding-block: 40px; color: var(--dim); font-size: 14px; }
+footer .wrap { display: grid; gap: 14px; }
+footer .row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: center; }
+
+@media (min-width: 980px) {
+  .hero-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: center; }
+  /* Syne is wide: keep the longest word ("computador.") inside the text column. */
+  .hero h1 { font-size: clamp(38px, 3.5vw, 52px); }
+}
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .nav .btn { margin-left: auto; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat:nth-child(3) { border-left: 0; }
+  .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .audience { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .feature, .feature.flip { grid-template-columns: minmax(0, 1fr); }
+  .feature.flip > :first-child { order: 0; }
+  .steps, .gallery, .two { grid-template-columns: minmax(0, 1fr); }
+  .price { grid-template-columns: minmax(0, 1fr); }
+  .price-box { border-left: 0; border-top: 1px solid var(--line); }
+}
+@media (max-width: 520px) {
+  body { font-size: 16px; }
+  .wrap { padding-inline: 16px; }
+  .audience { grid-template-columns: minmax(0, 1fr); }
+  .stat b { font-size: 28px; }
+  .panel dl { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .panel dd { margin-bottom: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .wave i { animation: none; transform: none; }
+  .btn { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#topo" aria-label="Umbra Voice Lab, início">
+      <img src="assets/icone.svg" alt="" width="34" height="34">
+      <span><strong>UMBRA</strong><small>VOICE LAB</small></span>
+    </a>
+    <nav class="nav-links" aria-label="Seções">
+      <a href="#recursos">Recursos</a>
+      <a href="#desempenho">Desempenho</a>
+      <a href="#requisitos">Requisitos</a>
+      <a href="#perguntas">Perguntas</a>
+    </nav>
+    <a class="btn btn-primary js-buy" href="#preco">Quero o Umbra</a>
+  </div>
+</header>
+
+<main id="topo">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Estúdio de voz para Windows</p>
+        <h1 style="margin-top:16px">Narrações de <em>uma hora</em>, geradas no seu computador.</h1>
+        <p class="lede">Cole o roteiro inteiro do vídeo, escolha uma voz e exporte um único MP3. Sem cobrança por caractere, sem enviar seus textos para a internet. Se fechar o programa no meio, ele continua de onde parou.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary js-buy" href="#preco">Comprar o Umbra Voice Lab</a>
+          <a class="btn" href="#recursos">Ver o que ele faz</a>
+        </div>
+        <p class="hero-note">Para Windows 10 e 11 (64 bits). Funciona na CPU: não precisa de placa de vídeo.</p>
+        <div class="wave" aria-hidden="true" id="wave"></div>
+        <div class="timecode">
+          <b>59:48</b>
+          <span>de narração geradas em cerca de 9 minutos, a partir de um roteiro de 9.084 palavras dividido em 212 blocos.</span>
+        </div>
+      </div>
+      <figure class="shot" style="margin:0">
+        <div class="shot-bar" aria-hidden="true"><i></i><i></i><i></i><span>Umbra Voice Lab · Texto para voz</span></div>
+        <img src="assets/tela-texto-para-voz.jpg" width="1424" height="861" alt="Tela Texto para voz do Umbra: roteiro sobre a história do café, voz Faber do Piper selecionada, narração pronta com forma de onda e botão Exportar áudio em MP3.">
+      </figure>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="stats" role="list">
+      <div class="stat" role="listitem"><b>43</b><span>vozes neurais Piper em português e inglês, além das vozes do Windows</span></div>
+      <div class="stat" role="listitem"><b>23</b><span>idiomas para a sua voz clonada narrar</span></div>
+      <div class="stat" role="listitem"><b>-16 LUFS</b><span>volume final normalizado, pronto para YouTube e podcast</span></div>
+      <div class="stat" role="listitem"><b>0</b><span>arquivos enviados para servidores: tudo roda no seu PC</span></div>
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">Para quem é</p>
+      <h2 style="margin-top:14px">Feito para quem publica voz toda semana.</h2>
+      <div class="audience">
+        <div><b>Canais dark e documentários</b><span>Roteiros longos narrados de uma vez, com pausas entre parágrafos e volume uniforme.</span></div>
+        <div><b>Audiolivros e histórias</b><span>Capítulos inteiros em um arquivo, com a voz que você escolher ou com a sua própria voz.</span></div>
+        <div><b>Cursos e treinamentos</b><span>Narre aulas, depois transcreva e exporte legendas SRT para o vídeo.</span></div>
+        <div><b>Podcasts e entrevistas</b><span>Limpe ruído, nivele o volume e separe a voz da música de fundo.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="recursos" style="padding-top:0">
+    <div class="wrap">
+      <div class="feature">
+        <div class="feature-copy">
+          <p class="eyebrow">Texto para voz</p>
+          <h2>Cole o roteiro. O Umbra cuida do resto.</h2>
+          <p>O texto é dividido em blocos, gerado em sequência e juntado num único arquivo. Você acompanha cada bloco pronto e o tempo que falta.</p>
+          <ul class="ticks">
+            <li>Roteiros de até 1 milhão de caracteres, sem cobrança por uso</li>
+            <li>Retoma de onde parou se o PC reiniciar ou se você fechar o app</li>
+            <li>Velocidade, volume e pausa entre blocos ajustáveis</li>
+            <li>Exporta MP3, WAV ou FLAC</li>
+          </ul>
+        </div>
+        <figure class="shot" style="margin:0">
+          <div class="shot-bar" aria-hidden="true"><i></i><i></i><i></i><span>Biblioteca de vozes</span></div>
+          <img src="assets/tela-biblioteca.jpg" width="1424" height="861" loading="lazy" alt="Biblioteca de vozes com vozes do Windows, vozes Piper Faber e Cadu e uma voz clonada, com filtros por idioma e botão para ouvir cada voz.">
+        </figure>
+      </div>
+
+      <div class="feature flip">
+        <div class="feature-copy">
+          <p class="eyebrow">Clonagem de voz</p>
+          <h2>Sua voz, narrando roteiros que você nunca gravou.</h2>
+          <p>Importe ou grave alguns minutos de fala limpa. O Umbra escolhe sozinho o melhor trecho da amostra e cria um perfil reutilizável com o motor Chatterbox.</p>
+          <ul class="ticks">
+            <li>Amostras de 3 segundos a 30 minutos</li>
+            <li>Narra em português, inglês, espanhol e mais 20 idiomas</li>
+            <li>Estilos padrão, calmo e expressivo</li>
+            <li>Gravador com medidor de nível e editor de tomadas</li>
+          </ul>
+          <p><span class="tag">Use apenas vozes que você tem autorização para clonar</span></p>
+        </div>
+        <figure class="shot" style="margin:0">
+          <div class="shot-bar" aria-hidden="true"><i></i><i></i><i></i><span>Clonagem de voz</span></div>
+          <img src="assets/tela-clonagem.jpg" width="1424" height="861" loading="lazy" alt="Tela de Clonagem de voz com o perfil Minha voz selecionado, a amostra usada em forma de onda e o botão Narrar roteiro com esta voz.">
+        </figure>
+      </div>
+
+      <div class="feature">
+        <div class="feature-copy">
+          <p class="eyebrow">Transcrição</p>
+          <h2>Do áudio para a legenda em minutos.</h2>
+          <p>Transcreva vídeos e áudios com o Whisper, revise cada trecho com o player ao lado e exporte as legendas.</p>
+          <ul class="ticks">
+            <li>Exporta SRT, VTT, TXT e JSON</li>
+            <li>Nome do locutor em cada fala</li>
+            <li>Ajuste global de tempos para sincronizar com o vídeo</li>
+            <li>Copie o roteiro completo com um clique</li>
+          </ul>
+        </div>
+        <figure class="shot" style="margin:0">
+          <div class="shot-bar" aria-hidden="true"><i></i><i></i><i></i><span>Transcrição</span></div>
+          <img src="assets/tela-transcricao.jpg" width="1424" height="861" loading="lazy" alt="Tela de Transcrição com a forma de onda do áudio, segmentos com horário de início e fim, locutor Narrador e exportação em SRT.">
+        </figure>
+      </div>
+
+      <div class="feature flip">
+        <div class="feature-copy">
+          <p class="eyebrow">Conversão e tratamento</p>
+          <h2>Troque o timbre e deixe o som limpo.</h2>
+          <p>Converta uma gravação para outra voz mantendo a sua interpretação, compare antes e depois e trate o áudio com uma cadeia de filtros.</p>
+          <ul class="ticks">
+            <li>Conversão de voz com seleção de trecho e transposição de tom</li>
+            <li>Redução de ruído, de-esser, compressor e limitador</li>
+            <li>Presets prontos: podcast, voz do celular, narração para vídeo</li>
+            <li>Separa a voz da música de fundo (Demucs)</li>
+          </ul>
+        </div>
+        <figure class="shot" style="margin:0">
+          <div class="shot-bar" aria-hidden="true"><i></i><i></i><i></i><span>Conversão de voz</span></div>
+          <img src="assets/tela-conversao.jpg" width="1424" height="861" loading="lazy" alt="Tela de Conversão de voz com área do áudio original, voz de destino, ajuste de transposição, estimativa de tempo e comparação A/B.">
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--surface);border-block:1px solid var(--line)">
+    <div class="wrap">
+      <p class="eyebrow">Como funciona</p>
+      <h2 style="margin-top:14px">Três passos até o arquivo final.</h2>
+      <div class="steps">
+        <div class="step"><h3>Cole ou importe o roteiro</h3><p>Texto puro ou arquivo .txt. Separe os parágrafos com uma linha em branco para ganhar pausas naturais.</p></div>
+        <div class="step"><h3>Escolha a voz</h3><p>Uma voz do Windows, uma das vozes Piper ou o seu perfil de voz clonada. Ouça uma amostra antes de gerar.</p></div>
+        <div class="step"><h3>Gere e exporte</h3><p>Acompanhe o progresso bloco a bloco. No fim, exporte um MP3 normalizado e coloque no seu editor de vídeo.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="desempenho">
+    <div class="wrap">
+      <p class="eyebrow">Desempenho real</p>
+      <h2 style="margin-top:14px">Quanto tempo leva, sem promessa exagerada.</h2>
+      <p class="lede" style="margin-top:16px">Medições feitas num PC com processador Intel Xeon E5-2650 v4, 16 GB de RAM e sem placa de vídeo dedicada para IA. Em processadores mais novos, tende a ser mais rápido.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tarefa</th><th>Tempo medido</th><th>Observação</th></tr></thead>
+          <tbody>
+            <tr><td>Narração com voz Piper</td><td class="num">~9 min por hora de áudio</td><td>Roteiro de 9.084 palavras virou 59,8 minutos de narração.</td></tr>
+            <tr><td>Narração com voz do Windows</td><td class="num">poucos minutos</td><td>Usa as vozes já instaladas no sistema.</td></tr>
+            <tr><td>Narração com voz clonada</td><td class="num">~5 a 6 h por hora de áudio</td><td>É o recurso mais pesado. Deixe gerando e volte depois; o Windows não entra em suspensão enquanto houver trabalho.<small>Com 2 processos em paralelo, que precisam de cerca de 9 GB de RAM livre.</small></td></tr>
+            <tr><td>Conversão de voz</td><td class="num">~3 min para 45 s de áudio</td><td>Inclui o carregamento do modelo, que acontece uma vez por conversão.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="footnote">Os tempos variam conforme o processador, a memória disponível e os outros programas abertos.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <p class="eyebrow">Por dentro do app</p>
+      <h2 style="margin-top:14px">Tudo em um só lugar.</h2>
+      <div class="gallery">
+        <figure><div class="shot"><img src="assets/tela-inicio.jpg" width="1424" height="861" loading="lazy" alt="Tela inicial com atalhos para gerar voz, transcrever, clonar e melhorar áudio, projetos recentes e áudios recentes."></div><figcaption>Início: projetos, áudios recentes e a fila de trabalhos.</figcaption></figure>
+        <figure><div class="shot"><img src="assets/tela-modelos.jpg" width="1424" height="861" loading="lazy" alt="Tela de Modelos com Windows SAPI, Piper, whisper.cpp e Chatterbox marcados como operacionais."></div><figcaption>Modelos: o que está instalado e pronto para usar.</figcaption></figure>
+        <figure><div class="shot"><img src="assets/tela-biblioteca.jpg" width="1424" height="861" loading="lazy" alt="Biblioteca de vozes com cartões de vozes e detalhes de licença."></div><figcaption>Biblioteca: ouça e compare as vozes antes de narrar.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="requisitos" style="padding-top:0">
+    <div class="wrap">
+      <p class="eyebrow">Requisitos e licenças</p>
+      <h2 style="margin-top:14px">Antes de comprar.</h2>
+      <div class="two">
+        <div class="panel">
+          <h3>Requisitos do computador</h3>
+          <dl>
+            <dt>Sistema</dt><dd>Windows 10 ou 11, 64 bits</dd>
+            <dt>Memória</dt><dd>8 GB para vozes do Windows, Piper e transcrição. 16 GB recomendados para voz clonada.</dd>
+            <dt>Processador</dt><dd>Qualquer CPU 64 bits moderna. Mais núcleos deixam a voz clonada mais rápida.</dd>
+            <dt>Placa de vídeo</dt><dd>Não é necessária</dd>
+            <dt>Internet</dt><dd>Só para baixar os modelos de voz na primeira vez</dd>
+          </dl>
+        </div>
+        <div class="panel license">
+          <h3>Uso comercial das vozes</h3>
+          <p>Você pode publicar e monetizar os áudios que criar, mas a licença depende da voz usada:</p>
+          <p><strong style="color:var(--fg)">Sua própria voz clonada</strong> é o caminho mais seguro para vender narrações.</p>
+          <p><strong style="color:var(--fg)">9 vozes Piper em inglês</strong> (Bryce, Kristin, Norman, LJSpeech, Cori, LibriTTS) foram treinadas com dados de domínio público ou CC BY.</p>
+          <p><strong style="color:var(--fg)">As vozes Piper em português</strong> foram derivadas de uma base com licença de pesquisa; o app mostra o aviso em cada uma.</p>
+          <p>Dentro do Umbra, cada voz mostra a sua licença antes de você usar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="preco" style="padding-top:0">
+    <div class="wrap">
+      <p class="eyebrow">Preço</p>
+      <h2 style="margin-top:14px">Tudo o que vem no Umbra.</h2>
+      <div class="price">
+        <div class="price-list">
+          <ul class="ticks">
+            <li>Texto para voz com vozes do Windows, Piper e voz clonada</li>
+            <li>Narrações longas, sem limite de caracteres</li>
+            <li>Clonagem e conversão de voz</li>
+            <li>Transcrição com legendas SRT e VTT</li>
+            <li>Tratamento de áudio e separação de voz e música</li>
+            <li>Projetos, biblioteca de vozes e fila de trabalhos</li>
+          </ul>
+        </div>
+        <div class="price-box">
+          <p class="eyebrow" id="price-label">Preço</p>
+          <div class="value" id="price-value">Sob consulta</div>
+          <p id="price-note">Fale comigo no WhatsApp para saber o preço e as condições de pagamento.</p>
+          <a class="btn btn-primary" id="buy" href="https://wa.me/message/EF4DJTI6JTOTH1" target="_blank" rel="noopener">Falar sobre o preço no WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="perguntas" style="padding-top:0">
+    <div class="wrap">
+      <p class="eyebrow">Perguntas frequentes</p>
+      <h2 style="margin-top:14px">Dúvidas comuns.</h2>
+      <div class="faq">
+        <details><summary>Quanto custa?</summary><p>O preço é passado direto pelo WhatsApp: <a href="https://wa.me/message/EF4DJTI6JTOTH1" target="_blank" rel="noopener">fale comigo aqui</a>.</p></details>
+        <details><summary>Precisa de internet para usar?</summary><p>Só para baixar os modelos de voz na primeira vez. Depois disso, gerar narrações, clonar, transcrever e tratar áudio funciona offline.</p></details>
+        <details><summary>Meus roteiros e gravações vão para algum servidor?</summary><p>Não. Todo o processamento acontece no seu computador. Textos, amostras de voz e áudios ficam nas suas pastas.</p></details>
+        <details><summary>Preciso de placa de vídeo?</summary><p>Não. O Umbra foi feito para rodar na CPU. Uma placa de vídeo não é usada pelo app.</p></details>
+        <details><summary>Quanto tempo leva para narrar um vídeo de 1 hora?</summary><p>Com as vozes Piper, cerca de 10 minutos no nosso PC de teste. Com a voz clonada, algumas horas: dá para deixar gerando enquanto faz outra coisa, e o app retoma de onde parou se for fechado.</p></details>
+        <details><summary>Funciona em Mac ou Linux?</summary><p>Não. O Umbra Voice Lab é feito para Windows 10 e 11 de 64 bits.</p></details>
+        <details><summary>Posso clonar a voz de outra pessoa?</summary><p>Apenas com autorização dela. O app pede a confirmação de consentimento e registra a origem da amostra em cada perfil de voz.</p></details>
+        <details><summary>Em quais formatos posso exportar?</summary><p>Narrações e áudios tratados em MP3, WAV e FLAC. Transcrições em SRT, VTT, TXT e JSON.</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <a class="brand" href="#topo"><img src="assets/icone.svg" alt="" width="28" height="28"><span><strong>UMBRA</strong><small>VOICE LAB</small></span></a>
+      <a class="btn btn-primary js-buy" href="#preco">Quero o Umbra</a>
+    </div>
+    <p>© 2026 Umbra Voice Lab. Motores de código aberto usados no app: Piper, Chatterbox (Resemble AI), whisper.cpp, Demucs e FFmpeg, cada um com a sua licença.</p>
+  </div>
+</footer>
+
+<script>
+// Sales settings: fill in the price and the checkout link (Hotmart, Kiwify, Stripe...) when they are ready.
+const SALE = {
+  price: '',          // e.g. 'R$ 197'
+  priceLabel: '',     // e.g. 'Pagamento único' or 'Assinatura anual'
+  priceNote: '',      // e.g. 'Pagamento único, à vista ou em até 12x.'
+  checkoutUrl: '',    // e.g. 'https://pay.exemplo.com/umbra'; empty = price section links to WhatsApp
+};
+
+if (SALE.price) {
+  document.getElementById('price-value').textContent = SALE.price;
+  document.getElementById('price-label').textContent = SALE.priceLabel || 'Preço';
+  document.getElementById('price-note').textContent = SALE.priceNote;
+}
+if (SALE.checkoutUrl) {
+  for (const link of document.querySelectorAll('.js-buy, #buy')) { link.href = SALE.checkoutUrl; link.rel = 'noopener'; }
+  document.getElementById('buy').textContent = 'Comprar o Umbra Voice Lab';
+}
+
+// Hero waveform: fixed bar heights so the first frame is complete without animation.
+const wave = document.getElementById('wave');
+const heights = [38, 62, 45, 80, 55, 92, 70, 48, 86, 64, 40, 74, 96, 58, 44, 82, 66, 52, 90, 60, 36, 72, 88, 50, 42, 78, 94, 56, 46, 84, 68, 54, 34, 76, 98, 62, 48, 80, 58, 40];
+heights.forEach((h, i) => {
+  const bar = document.createElement('i');
+  bar.style.height = h + '%';
+  bar.style.animationDelay = (i * 0.07) + 's';
+  wave.appendChild(bar);
+});
+</script>
+</body>
+</html>

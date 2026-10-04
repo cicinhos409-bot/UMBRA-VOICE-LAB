@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Umbra Voice Lab app icon: the sidebar mark (five voice bars inside a "U") on a dark tile. -->
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c1c1f"/>
+      <stop offset="1" stop-color="#050506"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.55">
+      <stop offset="0" stop-color="#f59e0b" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#tile)"/>
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#glow)"/>
+  <rect x="17.5" y="17.5" width="477" height="477" rx="106.5" fill="none" stroke="#f59e0b" stroke-opacity="0.35" stroke-width="3"/>
+  <g fill="url(#amber)">
+    <rect x="146" y="150" width="28" height="178" rx="14"/>
+    <rect x="200" y="104" width="28" height="270" rx="14"/>
+    <rect x="242" y="178" width="28" height="122" rx="14"/>
+    <rect x="284" y="104" width="28" height="270" rx="14"/>
+    <rect x="338" y="150" width="28" height="178" rx="14"/>
+  </g>
+  <path d="M128 318 v10 a128 96 0 0 0 256 0 v-10" fill="none" stroke="url(#amber)" stroke-width="30" stroke-linecap="round"/>
+</svg>
